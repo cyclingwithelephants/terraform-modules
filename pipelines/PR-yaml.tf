@@ -1,5 +1,4 @@
 locals {
-  pr = yamldecode(file("${module.path}/${var.tool_name}/pr-cloudbuild.yaml"))
 }
 
 resource "google_cloudbuild_trigger" "pull_request" {
@@ -8,7 +7,7 @@ resource "google_cloudbuild_trigger" "pull_request" {
   build {
     steps {
       dynamic "step" {
-        for_each = local.pr.steps
+        for_each = yamldecode(file("${module.path}/${var.tool_name}/pr-cloudbuild.yaml")).pr.steps
 
         # mandatory
         name = each.name

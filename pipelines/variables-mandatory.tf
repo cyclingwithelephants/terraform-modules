@@ -1,5 +1,6 @@
 variable "included_files" {
   description = "The list of files/directories (can include * and **) to trigger this/these triggers when they change."
+
 }
 
 variable "trigger_name" {
