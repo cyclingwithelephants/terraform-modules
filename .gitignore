@@ -1,3 +1,2 @@
 **/secrets.tfvars
-**/*.tfstate
-**/*.tfstate.backup
+**/*.tfstate*
