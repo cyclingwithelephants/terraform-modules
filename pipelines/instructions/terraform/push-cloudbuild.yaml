@@ -2,9 +2,11 @@ substitutions:
   _TF_LOCK_TIMEOUT_MINS: 0m
 
 steps:
-  - name: terraform
-    bash: |
-          echo hello
+  - name: hashicorp/terraform
+    args:
+      - -c
+      - |
+        echo hello
 # function tf_setup_workspace() {
 #     token=$(cat ~/.terraform.d/credentials.tfrc.json | jq --raw-output '.credentials."app.terraform.io".token')
 #     prefix=$(cat terraform.tf | hclq get --raw 'terraform.backend.remote.workspaces.prefix')
