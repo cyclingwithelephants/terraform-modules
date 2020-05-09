@@ -1,3 +1,6 @@
+substitutions:
+  _TF_LOCK_TIMEOUT_MINS: 0m
+
 steps:
   - name: terraform
     bash: |
@@ -34,9 +37,6 @@ steps:
             fi
           fi
 
-          _ORG='Cyclingwithelephants'
-
-
           ############## Do things
           terraform validate
 
@@ -50,6 +50,7 @@ steps:
           if [[ "$BRANCH" == "master" ]]; then
             terraform apply \
               --auto-approve \
+              --lock-timeout ${_TF_LOCK_TIMEOUT_MINS} \
               ./tfplan
 
           fi

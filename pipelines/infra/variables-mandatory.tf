@@ -12,3 +12,15 @@ variable "trigger_description" {
   description = "A short (or long) description to talk about any changes to the pipeline that make this different from the regular default trigger that is defined."
   type        = string
 }
+
+variable "project_id" {
+  description = "the GCP project_id to create resources inside"
+  type        = string
+  default     = "home-247920"
+}
+
+variable "tool_name" {
+  description = ""
+  type        = string
+  default     = "terraform"
+}

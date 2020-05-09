@@ -1,13 +1,14 @@
 options:
   env:
     -
-  substitutions:
-    _ORG: Cyclingwithelephants
+substitutions:
+  _ORG: Cyclingwithelephants
+
 steps:
-  - name: terraform:0.12
-    id: first
-    bash: echo hello
-  - name: eu.gcr.io/${var.project_id}/terraform
+  # - name: terraform:0.12
+  #   id: first
+  #   bash: echo hello
+  - name: eu.gcr.io/${project_id}/terraform
     bash: |
           function tf_setup_workspace() {
               token=$(cat ~/.terraform.d/credentials.tfrc.json | jq --raw-output '.credentials."app.terraform.io".token')
