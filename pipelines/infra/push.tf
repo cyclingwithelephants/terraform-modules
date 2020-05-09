@@ -63,6 +63,7 @@ resource "google_cloudbuild_trigger" "push" {
   included_files = var.included_files
   ignored_files  = var.ignored_files
 
+
   github {
     # coalesce returns the first non empty string in the list
     owner = lookup(var.github, "repo_owner", "")
