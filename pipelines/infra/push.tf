@@ -27,7 +27,15 @@ resource "google_cloudbuild_trigger" "push" {
         #   use that for the step
         # else
         #   just pass an empty string and return an error
-        args = lookup(step, "args", "failure")
+        args = [
+          "-c",
+          <<-EOF
+            |
+            echo hello
+          EOF
+        , ]
+
+        # lookup(step, "args", "failure")
         # lookup(step, "args", []) != [] ? lookup(step, "args", []) : ["-c", lookup(step, "bash", "echo 'If this is running in cloudbuild your BASH command hasn't come through terraform for some reason.")]
 
         # this gives our cloudbuild files multiline bash abstraction using
