@@ -71,7 +71,7 @@ resource "google_cloudbuild_trigger" "push" {
     # one of pull_request and push !!
     push {
       # only specify one of branch and tag !!
-      branch = lookup(local.push, "branch", ".")
+      branch = lookup(local.push, "branch", ".*")
       # tag    = lookup(local.push, "commit_tag", ".*")
     }
   }
