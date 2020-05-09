@@ -5,8 +5,8 @@ trigger_description = <<-EOF
   has the two supported build steps.
   EOF
 github = {
-  owner = "Cyclingwithelephants"
-  name  = "terraform-modules"
+  repo_owner = "Cyclingwithelephants"
+  repo_name  = "terraform-modules"
 
 }
 substitutions = {}

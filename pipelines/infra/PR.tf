@@ -57,7 +57,7 @@ resource "google_cloudbuild_trigger" "pull_request" {
 
   substitutions = lookup(local.pr, "substitutions", {})
 
-  name           = var.trigger_name
+  name           = "PR-${var.trigger_name}"
   description    = var.trigger_description
   included_files = var.included_files
   ignored_files  = var.ignored_files
@@ -65,15 +65,11 @@ resource "google_cloudbuild_trigger" "pull_request" {
   github {
     # coalesce returns the first non empty string in the list
     owner = lookup(var.github, "repo_owner", "Cyclingwithelephants")
-    name  = lookup(var.github, "repo_name", "")
+    name  = lookup(var.github, "repo_name", "terraform-modules")
+
     # one of pull_request and push !!
     pull_request {
-      branch = lookup(var.github, "branch", "*")
+      branch = lookup(var.github, "branch", ".*")
     }
-    # push {
-    #   # only specify one of branch and tag !!
-    #   branch = lookup(local.pr, "branch", "*")
-    #   tag    = lookup(local.pr, "commit_tag", "*")
-    # }
   }
 }

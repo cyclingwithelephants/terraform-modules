@@ -47,10 +47,10 @@ steps:
             -var-file=config/terraform.tfvars \
             -var-file=config/secrets.tfvars
 
-          if [[ "$BRANCH" == "master" ]]; then
-            terraform apply \
-              --auto-approve \
-              --lock-timeout ${_TF_LOCK_TIMEOUT_MINS} \
-              ./tfplan
-
-          fi
+          # if [[ "$BRANCH" == "master" ]]; then
+          #   terraform apply \
+          #     --auto-approve \
+          #     --lock-timeout ${_TF_LOCK_TIMEOUT_MINS} \
+          #     ./tfplan
+          #
+          # fi

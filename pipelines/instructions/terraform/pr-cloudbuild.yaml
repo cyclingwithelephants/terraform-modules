@@ -5,9 +5,9 @@ substitutions:
   _ORG: Cyclingwithelephants
 
 steps:
-  # - name: terraform:0.12
-  #   id: first
-  #   bash: echo hello
+  - name: terraform:0.12
+    id: first
+    bash: echo hello
   - name: eu.gcr.io/${project_id}/terraform
     bash: |
           function tf_setup_workspace() {

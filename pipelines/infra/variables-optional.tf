@@ -11,7 +11,7 @@ variable "github" {
     branch     = ""
     commit_tag = ""
     repo_name  = ""
-    repo_owner = ""
+    repo_owner = "Cyclingwithelephants"
   }
 }
 
