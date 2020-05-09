@@ -1,4 +1,4 @@
-included_files      = ["*"]
+included_files      = ["/pipelines/infra"]
 trigger_name        = "example-trigger"
 trigger_description = <<-EOF
   This is a way to automatically add CI/CD to any piece of code, as long as it
