@@ -63,7 +63,6 @@ resource "google_cloudbuild_trigger" "push" {
   included_files = var.included_files
   ignored_files  = var.ignored_files
 
-
   github {
     # coalesce returns the first non empty string in the list
     owner = lookup(var.github, "repo_owner", "")
@@ -72,7 +71,7 @@ resource "google_cloudbuild_trigger" "push" {
     # one of pull_request and push !!
     push {
       # only specify one of branch and tag !!
-      branch = lookup(local.push, "branch", ".*")
+      branch = lookup(local.push, "branch", ".")
       # tag    = lookup(local.push, "commit_tag", ".*")
     }
   }
