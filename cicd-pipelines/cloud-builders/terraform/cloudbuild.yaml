@@ -12,6 +12,7 @@ steps:
     env:
       - 'TERRAFORM_VERSION=${_TERRAFORM_VERSION}'
       - 'TERRAFORM_VERSION_SHA256SUM=${_TERRAFORM_VERSION_SHA256SUM}'
+      - 'DOCKER_BUILDKIT=1'
     args:
       - build
       - --build-arg

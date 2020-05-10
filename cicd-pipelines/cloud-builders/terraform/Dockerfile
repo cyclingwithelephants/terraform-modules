@@ -27,8 +27,7 @@ RUN apk update && \
     && echo "" > /root/.ash_history
 
 # copy pipeline files if they exist
-ADD ./push.sh /commands/terraform/push.sh
-ADD ./pr.sh /commands/terraform/pr.sh
+ADD ./scripts/ /commands/terraform/
 
 # not too sure what this is for. A little worried I need it set for bash
 ENV LC_ALL=en_US.UTF-8
