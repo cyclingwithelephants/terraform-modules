@@ -1,5 +1,5 @@
 locals {
-  pr = var.cloudbuild_overrides.pr != "" ? yamldecode(file("${path.module}/${var.cloudbuild_overrides.push}")) : yamldecode(file("${path.module}/../cloudbuild/${var.tool_name}/pr-cloudbuild.yaml"))
+  pr = var.cloudbuild_overrides.pr != "" ? yamldecode(file("${path.module}/${var.cloudbuild_overrides.push}")) : yamldecode(file("${path.module}/../pipelines/${var.tool_name}/pr-cloudbuild.yaml"))
 }
 
 resource "google_cloudbuild_trigger" "pull_request" {

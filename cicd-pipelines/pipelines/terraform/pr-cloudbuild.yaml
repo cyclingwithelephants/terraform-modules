@@ -1,0 +1,15 @@
+options:
+  env:
+    -
+steps:
+  # - name: gcr.io/cloud-builders/git
+  #   id: second
+  #   wait_for:
+  #     - first
+  #   sh: |
+  #       git pull --rebase origin ${BASE_BRANCH}
+  #       git push origin master
+
+  - name: eu.gcr.io/${PROJECT_ID}/builder-terraform
+    sh: |
+        /commands/terraform/pr

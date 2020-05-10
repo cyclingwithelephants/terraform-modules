@@ -1,0 +1,8 @@
+substitutions:
+  _BUCKET_NAME:
+
+steps:
+  - name: eu.gcr.io/${PROJECT_ID}/builder-hugo
+    timeout: 45s
+    sh: |
+        /commands/hugo/push
