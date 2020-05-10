@@ -39,3 +39,21 @@ variable "ignored_files" {
   type        = list(string)
   default     = [""]
 }
+
+variable "cloudbuild_overrides" {
+  description = <<-EOF
+                each value is the path to the cloudbuild file that provides
+                instructions for the given pipeline."
+                EOF
+  type        = map(string)
+  default = {
+    push = ""
+    pr   = ""
+  }
+}
+
+variable "project_id" {
+  description = "the GCP project_id to create resources inside"
+  type        = string
+  default     = "home-247920"
+}

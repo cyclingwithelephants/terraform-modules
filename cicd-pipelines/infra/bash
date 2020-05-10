@@ -31,14 +31,27 @@ function tf_setup_workspace() {
     echo "ws is $ws"
 
     # gets workspace if it exists, creates it if it doesn't already
-    terraform workspace select "${env}" 2>/dev/null || terraform workspace new ${env} && terraform workspace select ${env}
+    # terraform workspace select "${env}" 2>/dev/null || terraform workspace new ${env} && terraform workspace select ${env}
+    terraform workspace select "${env}" 2>/dev/null || terraform workspace new ${env}
 
     # turns off the remote-excute function on terraform when we create a new workspace
-    curl -s --request PATCH \
+    operations=$(curl --request PATCH \
          --header "Authorization: Bearer $token" \
          --header "Content-Type: application/vnd.api+json" \
          --data '{"data":{"attributes":{"operations":false}}}' \
-         --url https://app.terraform.io/api/v2/organizations/${_ORG}/workspaces/"${ws}" 1>/dev/null # It will silently pass but notify of failure
+         --url https://app.terraform.io/api/v2/organizations/${_ORG}/workspaces/"${ws}" \
+         -s | jq '.data.attributes.operations')
+
+    if [[ "${operations}" != "false" ]]; then
+      cat <<-EOF
+          The pipeline failed when trying to turn off auto-run
+          for remote terraform states, printing error response:
+          ---
+          ${operations}
+EOF
+      exit 1
+    fi
+         # 1>/dev/null # It will silently pass but notify of failure
 }
 
 
@@ -46,6 +59,9 @@ function tf_setup_workspace() {
 ############## Config
 env="$(get_env)"
 echo "env is $env"
+
+# if terraform org is empty, we are outisde cloudbuild and so we initiate this as a test
+[[ "${_ORG}" == "" ]] && _ORG=cyclingwithelephants
 ############## Do things
 # terraform validate
 
@@ -53,18 +69,18 @@ tf_setup_workspace "${env}"
 
 terraform init
 
-
+terraform destroy -auto-approve
 # tf_plan_flags="-var-file=config/terraform.tfvars -var-file=config/secrets.tfvars"
-
-
+rm -f ./tfplan
 terraform plan \
-  -out=./tfplan \
+  -out=./tfplan
   # "${tf_plan_flags}"
+# unset TF_LOG
 
-if [[ "$BRANCH_NAME" == "master" ]]; then
-  terraform apply \
-    --auto-approve \
-    --lock-timeout ${_TF_LOCK_TIMEOUT_MINS} \
-    ./tfplan
-
-fi
+# if [[ "$BRANCH_NAME" == "master" ]]; then
+terraform apply \
+  -auto-approve \
+  -lock-timeout=${_TF_LOCK_TIMEOUT_MINS:-0s} \
+  ./tfplan
+rm -f ./tfplan
+# fi

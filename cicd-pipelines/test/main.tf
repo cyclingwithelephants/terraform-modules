@@ -1,47 +1,14 @@
 locals {
-  push = yamldecode(file("${path.module}/../instructions/terraform/push-cloudbuild.yaml"))
-  args = [
-    "-c",
-    <<-EOF
-
-    EOF
-    ,
-  ]
+  push = yamldecode(file("${path.module}/../infra/instructions/terraform/push-cloudbuild.yaml"))
 }
 
 resource "google_cloudbuild_trigger" "push" {
   provider = google-beta
   count    = var.create_triggers["push"] == true ? 1 : 0
-
-  build {
-    dynamic "step" {
-      for_each = [for step in local.push.steps : {
-        # mandatory
-        name = step.name
-
-        # optional
-        timeout  = lookup(step, "timeout", "")
-        wait_for = lookup(step, "wait_for", "")
-        id       = lookup(step, "id", "")
-        dir      = lookup(step, "dir", "")
-        env      = lookup(step, "env", [])
-        timeout  = lookup(step, "timeout", "")
-        args     = local.args
-
-        entrypoint = "/bin/sh"
-
-      }]
-
-      content {
-        name = step.value.name
-      }
-    }
-  }
-
   # filename      = "cloudbuild.yaml"
   substitutions = {}
 
-  name           = "PUSH-test"
+  name           = "PUSH-test-lol"
   description    = "what a lovely description"
   included_files = ["*"]
   ignored_files  = []
@@ -60,9 +27,9 @@ resource "google_cloudbuild_trigger" "push" {
   }
 }
 
-output "args" {
-  value = local.args
-}
+# output "args" {
+#   value = local.args
+# }
 
 output "push" {
   value = local.push
@@ -89,4 +56,12 @@ variable "project_id" {
   description = "the GCP project_id to create resources inside"
   type        = string
   default     = "home-247920"
+}
+
+# output "push_cloudbuild" {
+#   value = local.push
+# }
+
+output "trigger" {
+  value = google_cloudbuild_trigger.push
 }

@@ -1,0 +1,92 @@
+options:
+  env:
+    -
+steps:
+  - name: terraform
+    id: first
+    # entrypoint: /bin/sh
+    # args:
+    #   - -c
+    #   - |
+    #     echo hello
+    #     echo world
+    sh: |
+        echo hello
+        echo world2
+  - name: hashicorp/terraform
+    id: second
+    sh: |
+        function get_env() {
+          # BRANCH_NAME is a cloudbuild built-in variable
+
+          if [[ ${BRANCH_NAME} ]]; then
+            if [[ ${BRANCH_NAME} == "master" ]]; then
+              env='prod'
+            else
+              # _PR_NUMBER is a github cloudbuild built-in
+              env="dev-${BRANCH_NAME}"
+            fi
+          else # is being executed locally
+            branch_name=$(git symbolic-ref --short HEAD)
+            if [[ ${branch_name} == "master" ]]; then
+              env='prod'
+            else
+              env="dev-${branch_name}"
+            fi
+          fi
+          echo ${env}
+        }
+
+        function tf_setup_workspace() {
+            env=$1
+
+            token=$(cat ~/.terraform.d/credentials.tfrc.json | jq --raw-output '.credentials."app.terraform.io".token')
+            prefix=$(cat terraform.tf | hclq get --raw 'terraform.backend.remote.workspaces.prefix')
+            echo $prefix
+            ws="${prefix}${env}"
+            echo "ws is $ws"
+
+            # gets workspace if it exists, creates it if it doesn't already
+            terraform workspace select "${env}" 2>/dev/null || terraform workspace new ${env} && terraform workspace select ${env}
+
+            # turns off the remote-excute function on terraform when we create a new workspace
+            curl -s --request PATCH \
+                 --header "Authorization: Bearer $token" \
+                 --header "Content-Type: application/vnd.api+json" \
+                 --data '{"data":{"attributes":{"operations":false}}}' \
+                 --url https://app.terraform.io/api/v2/organizations/${_ORG}/workspaces/"${ws}" 1>/dev/null # It will silently pass but notify of failure
+        }
+
+
+
+        ############## Config
+        env="$(get_env)"
+        echo "env is $env"
+        ############## Do things
+
+        # We get the most up to date version of production so
+        # that we can create a plan based off of that
+        git pull --rebase origin master
+
+
+        # terraform validate
+
+        tf_setup_workspace "${env}"
+
+        terraform init
+
+
+        # tf_plan_flags="-var-file=config/terraform.tfvars -var-file=config/secrets.tfvars"
+
+
+        terraform plan \
+          -out=./tfplan \
+          # "${tf_plan_flags}"
+
+        if [[ "$BRANCH_NAME" == "master" ]]; then
+          terraform apply \
+            --auto-approve \
+            --lock-timeout ${_TF_LOCK_TIMEOUT_MINS} \
+            ./tfplan
+
+        fi

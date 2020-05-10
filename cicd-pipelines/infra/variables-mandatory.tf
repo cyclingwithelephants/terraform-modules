@@ -13,14 +13,18 @@ variable "trigger_description" {
   type        = string
 }
 
-variable "project_id" {
-  description = "the GCP project_id to create resources inside"
-  type        = string
-  default     = "home-247920"
-}
-
 variable "tool_name" {
   description = ""
   type        = string
   default     = "terraform"
+}
+
+variable "starting_directory_overrides" {
+  description = "if your code doesn't exist under the path $repo_root/$tool_name/ then specify where to immediately cd to for the build."
+  type        = map(string)
+  default = {
+    pr       = ""
+    push     = ""
+    tag_push = ""
+  }
 }
