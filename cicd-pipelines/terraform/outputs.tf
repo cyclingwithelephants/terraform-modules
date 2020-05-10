@@ -21,6 +21,6 @@ output "push" {
 
 output "pr" {
   value = {
-    trigger_id = 
+    trigger_id = google_cloudbuild_trigger.pr
   }
 }
