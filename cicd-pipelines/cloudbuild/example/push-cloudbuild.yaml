@@ -1,0 +1,72 @@
+steps:
+  - name: hashicorp/terraform
+    timeout: 601s
+    sh: |
+        function get_env() {
+          # BRANCH_NAME is a cloudbuild built-in variable
+
+          if [[ ${BRANCH_NAME} ]]; then
+            if [[ ${BRANCH_NAME} == "master" ]]; then
+              env='prod'
+            else
+              # _PR_NUMBER is a github cloudbuild built-in
+              env="dev-${BRANCH_NAME}"
+            fi
+          else # is being executed locally
+            branch_name=$(git symbolic-ref --short HEAD)
+            if [[ ${branch_name} == "master" ]]; then
+              env='prod'
+            else
+              env="dev-${branch_name}"
+            fi
+          fi
+          echo ${env}
+        }
+
+        function tf_setup_workspace() {
+            env=$1
+
+            token=$(cat ~/.terraform.d/credentials.tfrc.json | jq --raw-output '.credentials."app.terraform.io".token')
+            prefix=$(cat terraform.tf | hclq get --raw 'terraform.backend.remote.workspaces.prefix')
+            ws="${prefix}${env}"
+
+            # gets workspace if it exists, creates it if it doesn't already
+            terraform workspace select "${env}" 2>/dev/null || $(terraform workspace new ${env} && curl="true")
+
+            # turns off the remote-excute function on terraform when we create a new workspace
+            [[ "${curl}" == "true" ]] && \
+              curl --request PATCH \
+                   --header "Authorization: Bearer $token" \
+                   --header "Content-Type: application/vnd.api+json" \
+                   --data '{"data":{"attributes":{"operations":false}}}' \
+                   --url https://app.terraform.io/api/v2/organizations/${_ORG}/workspaces/"${ws}" \
+                   -s # stops showing download progress
+        }
+
+        ############## Config
+        env="$(get_env)"
+
+        # if terraform org is empty, we are outisde cloudbuild and so we initiate this as a test
+        [[ "${_ORG}" == "" ]] && _ORG=cyclingwithelephants
+
+
+        ############## Do things
+        terraform validate
+
+        tf_setup_workspace "${env}"
+
+        terraform init
+
+
+        # tf_plan_flags="-var-file=config/terraform.tfvars -var-file=config/secrets.tfvars"
+
+
+        terraform plan \
+          -out=./tfplan \
+          # "${tf_plan_flags}"
+
+        [[ "${env}" == "prod" ]] && \
+          terraform apply \
+            --auto-approve \
+            --lock-timeout ${_TF_LOCK_TIMEOUT_MINS} \
+            ./tfplan
