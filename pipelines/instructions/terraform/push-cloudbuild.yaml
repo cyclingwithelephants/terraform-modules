@@ -3,6 +3,7 @@ substitutions:
 
 steps:
   - name: hashicorp/terraform
+    timeout: 600s
     args:
       - -c
       - |

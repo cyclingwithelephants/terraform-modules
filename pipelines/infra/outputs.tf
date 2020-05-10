@@ -22,3 +22,7 @@
 output "push" {
   value = google_cloudbuild_trigger.push
 }
+
+output "push_cloudbuild" {
+  value = local.push
+}
