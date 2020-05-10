@@ -12,4 +12,4 @@ steps:
 
   - name: eu.gcr.io/${PROJECT_ID}/builder-terraform
     sh: |
-        /commands/terraform/pr
+        /builder/terraform/pr
