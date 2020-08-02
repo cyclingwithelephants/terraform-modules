@@ -8,20 +8,18 @@ steps:
   - name: 'gcr.io/cloud-builders/wget'
     args: ["https://releases.hashicorp.com/terraform/${_TERRAFORM_VERSION}/terraform_${_TERRAFORM_VERSION}_linux_amd64.zip"]
 
-  - name: 'gcr.io/cloud-builders/docker'
+  - name: gcr.io/kaniko-project/executor
     env:
       - 'TERRAFORM_VERSION=${_TERRAFORM_VERSION}'
       - 'TERRAFORM_VERSION_SHA256SUM=${_TERRAFORM_VERSION_SHA256SUM}'
-      - 'DOCKER_BUILDKIT=1'
     args:
-      - build
-      - --build-arg
-      - TERRAFORM_VERSION=${_TERRAFORM_VERSION}
-      - --build-arg
-      - TERRAFORM_VERSION_SHA256SUM=${_TERRAFORM_VERSION_SHA256SUM}
-      - --tag
-      - gcr.io/${PROJECT_ID}/builder-terraform:${_TERRAFORM_VERSION}
-      - .
+    - --destination=gcr.io/$PROJECT_ID/image
+    - --cache=true
+    - --cache-ttl=24h
+    - --build-arg
+    - TERRAFORM_VERSION=${_TERRAFORM_VERSION}
+    - --build-arg
+    - TERRAFORM_VERSION_SHA256SUM=${_TERRAFORM_VERSION_SHA256SUM}
 
 images:
   - gcr.io/${PROJECT_ID}/builder-terraform:${_TERRAFORM_VERSION}

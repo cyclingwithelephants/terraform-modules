@@ -45,7 +45,7 @@ resource "google_cloudbuild_trigger" "push" {
       }
     }
   }
-  substitutions  = merge(local.push.substitutions, var.substitutions)
+  substitutions  = merge(local.push["substitutions"], var.substitutions)
   name           = "PUSH-${var.repo_name}"
   description    = ""
   included_files = setunion(var.included_files, [var.code_directory_override])
